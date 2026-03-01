@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Horegallu — by Abinzz</title>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: Arial;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #chat {
+      width: 380px;
+      background: #111;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,255,150,.3);
+    }
+    h2 {
+      text-align: center;
+      margin: 5px 0;
+      color: #00ff99;
+    }
+    #brand {
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    #status, #count, #typing {
+      font-size: 12px;
+      margin: 5px 0;
+      color: #aaa;
+    }
+    #messages {
+      height: 260px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      padding: 6px;
+      margin-bottom: 10px;
+      background: #000;
+    }
+    input {
+      width: 70%;
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      width: 25%;
+      padding: 6px;
+      background: #00ff99;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #next {
+      margin-top: 6px;
+      width: 100%;
+      background: #ff5555;
+    }
+  </style>
+</head>
+
+<body>
+<div id="chat">
+  <h2>Horegallu</h2>
+  <div id="brand">by Abinzz</div>
+
+  <div id="count">Online: 0</div>
+  <div id="status">Connecting...</div>
+  <div id="typing"></div>
+
+  <div id="messages"></div>
+
+  <input id="msg" placeholder="Type message..." oninput="typing()" />
+  <button onclick="send()">Send</button>
+  <button id="next" onclick="next()">Next</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const messages = document.getElementById("messages");
+  const status = document.getElementById("status");
+  const typingText = document.getElementById("typing");
+  const count = document.getElementById("count");
+
+  socket.on("user-count", n => count.innerText = "Online: " + n);
+  socket.on("waiting", () => status.innerText = "Waiting for a stranger...");
+  socket.on("matched", () => status.innerText = "Connected to a stranger!");
+  socket.on("partner-left", () => status.innerText = "Stranger left. Click Next.");
+
+  socket.on("message", msg => add("Stranger: " + msg));
+  socket.on("typing", () => {
+    typingText.innerText = "Stranger is typing...";
+    setTimeout(() => typingText.innerText = "", 1000);
+  });
+
+  function send() {
+    const i = msg.value;
+    if (i.trim()) {
+      socket.emit("message", i);
+      add("You: " + i);
+      msg.value = "";
+    }
+  }
+
+  function typing() {
+    socket.emit("typing");
+  }
+
+  function next() {
+    messages.innerHTML = "";
+    socket.emit("next");
+  }
+
+  function add(t) {
+    const d = document.createElement("div");
+    d.innerText = t;
+    messages.appendChild(d);
+    messages.scrollTop = messages.scrollHeight;
+  }
+</script>
+</body>
+</html>

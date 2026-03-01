@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Test</title>
+</head>
+<body>
+  <h2>Anonymous Chat</h2>
+  <div id="status"></div>
+  <div id="chat"></div>
+
+  <input id="messageInput" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io("http://localhost:3000");
+
+    const statusDiv = document.getElementById("status");
+    const chatDiv = document.getElementById("chat");
+    const input = document.getElementById("messageInput");
+
+    socket.on("waiting", () => {
+      statusDiv.innerText = "Waiting for stranger...";
+    });
+
+    socket.on("matched", () => {
+      statusDiv.innerText = "Connected to stranger!";
+    });
+
+    socket.on("message", (msg) => {
+      chatDiv.innerHTML += "<p><b>Stranger:</b> " + msg + "</p>";
+    });
+
+    function sendMessage() {
+      const msg = input.value;
+      socket.emit("message", msg);
+      chatDiv.innerHTML += "<p><b>You:</b> " + msg + "</p>";
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
