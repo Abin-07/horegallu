@@ -3,10 +3,18 @@
 <head>
   <title>Horegallu — by Abinzz</title>
 
-  <!-- ✅ RESPONSIVE FIX (VERY IMPORTANT) -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ❌ ZOOM DISABLED (IMPORTANT) -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <style>
+    /* ✅ EXTRA SAFETY AGAINST ZOOM */
+    html, body {
+      touch-action: manipulation;
+      overscroll-behavior: contain;
+    }
+
     body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       font-family: Arial, sans-serif;
@@ -60,7 +68,7 @@
       padding: 8px;
       border-radius: 5px;
       border: none;
-      font-size: 16px;
+      font-size: 16px; /* prevents iOS zoom */
     }
 
     button {
@@ -79,7 +87,6 @@
       background: #ff5555;
     }
 
-    /* 🚨 REPORT BUTTON */
     #report {
       margin-top: 6px;
       width: 100%;
@@ -103,8 +110,6 @@
   <button onclick="send()">Send</button>
 
   <button id="next" onclick="next()">Next</button>
-
-  <!-- 🚨 REPORT BUTTON ADDED -->
   <button id="report" onclick="reportUser()">Report</button>
 </div>
 
@@ -134,8 +139,8 @@
     status.innerText = "Stranger left. Click Next.";
   });
 
-  socket.on("message", msg => {
-    add("Stranger: " + msg);
+  socket.on("message", text => {
+    add("Stranger: " + text);
   });
 
   socket.on("typing", () => {
@@ -143,7 +148,6 @@
     setTimeout(() => typingText.innerText = "", 1000);
   });
 
-  // 🚫 BANNED HANDLER
   socket.on("banned", data => {
     document.body.innerHTML =
       "<h2 style='color:white;text-align:center;padding:20px'>" +
