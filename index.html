@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Horegallu — by Abinzz</title>
+
+  <!-- ✅ RESPONSIVE FIX (VERY IMPORTANT) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       color: white;
       display: flex;
       justify-content: center;
@@ -14,54 +17,73 @@
       height: 100vh;
       margin: 0;
     }
+
     #chat {
-      width: 380px;
+      width: 90%;
+      max-width: 380px;
       background: #111;
       padding: 15px;
       border-radius: 15px;
       box-shadow: 0 0 20px rgba(0,255,150,.3);
     }
+
     h2 {
       text-align: center;
       margin: 5px 0;
       color: #00ff99;
     }
+
     #brand {
       text-align: center;
       font-size: 12px;
       opacity: 0.7;
     }
+
     #status, #count, #typing {
       font-size: 12px;
       margin: 5px 0;
       color: #aaa;
     }
+
     #messages {
-      height: 260px;
+      height: 40vh;
+      max-height: 260px;
       overflow-y: auto;
       border: 1px solid #333;
       padding: 6px;
       margin-bottom: 10px;
       background: #000;
     }
+
     input {
       width: 70%;
-      padding: 6px;
+      padding: 8px;
       border-radius: 5px;
       border: none;
+      font-size: 16px;
     }
+
     button {
       width: 25%;
-      padding: 6px;
+      padding: 8px;
       background: #00ff99;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
     }
+
     #next {
       margin-top: 6px;
       width: 100%;
       background: #ff5555;
+    }
+
+    /* 🚨 REPORT BUTTON */
+    #report {
+      margin-top: 6px;
+      width: 100%;
+      background: #ff9800;
     }
   </style>
 </head>
@@ -79,33 +101,61 @@
 
   <input id="msg" placeholder="Type message..." oninput="typing()" />
   <button onclick="send()">Send</button>
+
   <button id="next" onclick="next()">Next</button>
+
+  <!-- 🚨 REPORT BUTTON ADDED -->
+  <button id="report" onclick="reportUser()">Report</button>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
+
   const messages = document.getElementById("messages");
   const status = document.getElementById("status");
   const typingText = document.getElementById("typing");
   const count = document.getElementById("count");
+  const msg = document.getElementById("msg");
 
-  socket.on("user-count", n => count.innerText = "Online: " + n);
-  socket.on("waiting", () => status.innerText = "Waiting for a stranger...");
-  socket.on("matched", () => status.innerText = "Connected to a stranger!");
-  socket.on("partner-left", () => status.innerText = "Stranger left. Click Next.");
+  socket.on("user-count", n => {
+    count.innerText = "Online: " + n;
+  });
 
-  socket.on("message", msg => add("Stranger: " + msg));
+  socket.on("waiting", () => {
+    status.innerText = "Waiting for a stranger...";
+  });
+
+  socket.on("matched", () => {
+    status.innerText = "Connected to a stranger!";
+  });
+
+  socket.on("partner-left", () => {
+    status.innerText = "Stranger left. Click Next.";
+  });
+
+  socket.on("message", msg => {
+    add("Stranger: " + msg);
+  });
+
   socket.on("typing", () => {
     typingText.innerText = "Stranger is typing...";
     setTimeout(() => typingText.innerText = "", 1000);
   });
 
+  // 🚫 BANNED HANDLER
+  socket.on("banned", data => {
+    document.body.innerHTML =
+      "<h2 style='color:white;text-align:center;padding:20px'>" +
+      "🚫 You are banned until:<br>" + data.until +
+      "</h2>";
+  });
+
   function send() {
-    const i = msg.value;
-    if (i.trim()) {
-      socket.emit("message", i);
-      add("You: " + i);
+    const text = msg.value;
+    if (text.trim()) {
+      socket.emit("message", text);
+      add("You: " + text);
       msg.value = "";
     }
   }
@@ -119,9 +169,16 @@
     socket.emit("next");
   }
 
-  function add(t) {
+  function reportUser() {
+    if (confirm("Report this user for abuse?")) {
+      socket.emit("report");
+      alert("User reported successfully.");
+    }
+  }
+
+  function add(text) {
     const d = document.createElement("div");
-    d.innerText = t;
+    d.innerText = text;
     messages.appendChild(d);
     messages.scrollTop = messages.scrollHeight;
   }
