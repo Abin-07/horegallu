@@ -250,6 +250,12 @@ background:#00cc77;
     messages.appendChild(d);
     messages.scrollTop = messages.scrollHeight;
   }
+  msg.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    send();
+  }
+  });
 </script>
 </body>
 </html>
