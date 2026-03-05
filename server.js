@@ -10,14 +10,42 @@ const reports = {}; // { ip: { count, bannedUntil } }
 const server = http.createServer(app);
 const io = new Server(server);
 
+const debateTopics = [
+"Is AI dangerous for humanity?",
+"Should social media be regulated?",
+"Is cryptocurrency the future of money?",
+"Should college education be free?",
+"Is remote work better than office work?",
+"Are smartphones harming society?"
+];
+
 let waitingUser = null;
 let onlineUsers = 0;
+let waitingDebater = null;
 
 io.on("connection", (socket) => {
   const ip =
     socket.handshake.headers["x-forwarded-for"] ||
     socket.conn.remoteAddress;
+  socket.on("join-debate", () => {
 
+    if(waitingDebater){
+        
+        const topic = debateTopics[Math.floor(Math.random()*debateTopics.length)];
+
+        socket.partner = waitingDebater;
+        waitingDebater.partner = socket;
+
+        socket.emit("debate-topic",topic);
+        waitingDebater.emit("debate-topic",topic);
+
+        waitingDebater = null;
+
+    }else{
+        waitingDebater = socket;
+    }
+
+});
   // 🔒 BAN CHECK
   if (reports[ip] && reports[ip].bannedUntil > Date.now()) {
     socket.emit("banned", {
