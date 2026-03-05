@@ -107,6 +107,21 @@
       align-items: center;
       z-index: 999;
     }
+        #menu{
+      display:flex;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+      #menu button
+      {
+        flex:1;
+        padding:10px;
+        background:#00ff99;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+    }
   </style>
 </head>
 
@@ -127,7 +142,10 @@
   <button id="next" onclick="next()">Next</button>
   <button id="report" onclick="reportUser()">Report</button>
 </div>
-
+<div id="menu">
+  <button onclick="window.location.href='chat.html'">💬 Stranger Chat</button>
+  <button onclick="window.location.href='debate.html'">🔥 Debate Arena</button>
+</div>
 <!-- 🔻 AD AT BOTTOM -->
 <div id="ad-container">
   <script>
