@@ -122,11 +122,42 @@
         border-radius:6px;
         cursor:pointer;
     }
+    #chat{
+position:relative;
+width:90%;
+max-width:380px;
+background:#111;
+padding:15px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(0,255,150,.3);
+}
+
+#debateBtn{
+position:absolute;
+top:12px;
+right:12px;
+background:#00ff99;
+color:black;
+padding:6px 10px;
+border-radius:6px;
+font-size:13px;
+text-decoration:none;
+font-weight:bold;
+transition:0.2s;
+}
+
+#debateBtn:hover{
+background:#00cc77;
+}
   </style>
 </head>
 
 <body>
 <div id="chat">
+
+  <!-- Debate Button Top Right -->
+  <a href="/debate.html" id="debateBtn">🔥 Debate</a>
+
   <h2>Horegallu</h2>
   <div id="brand">by Abinzz</div>
 
@@ -140,7 +171,9 @@
   <button onclick="send()">Send</button>
 
   <button id="next" onclick="next()">Next</button>
+
   <button id="report" onclick="reportUser()">Report</button>
+
 </div>
 <div id="menu">
   <button onclick="window.location.href='chat.html'">💬 Stranger Chat</button>
