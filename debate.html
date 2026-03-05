@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Debate Arena - Horegallu</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+background:#111;
+color:white;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+#debateBox{
+width:90%;
+max-width:400px;
+background:#000;
+padding:15px;
+border-radius:10px;
+}
+
+h2{
+text-align:center;
+color:#00ff99;
+}
+
+#topic{
+background:#222;
+padding:10px;
+margin-bottom:10px;
+border-radius:6px;
+text-align:center;
+color:#ffcc00;
+}
+
+#messages{
+height:250px;
+overflow-y:auto;
+border:1px solid #333;
+padding:5px;
+margin-bottom:10px;
+}
+
+input{
+width:70%;
+padding:8px;
+}
+
+button{
+width:25%;
+padding:8px;
+background:#00ff99;
+border:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="debateBox">
+
+<h2>🔥 Debate Arena</h2>
+
+<div id="topic">Loading topic...</div>
+
+<div id="messages"></div>
+
+<input id="msg">
+<button onclick="send()">Send</button>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+const topicDiv = document.getElementById("topic");
+const messages = document.getElementById("messages");
+const msg = document.getElementById("msg");
+
+socket.emit("join-debate");
+
+socket.on("debate-topic",(topic)=>{
+topicDiv.innerText = "Topic: " + topic;
+});
+
+socket.on("message",(m)=>{
+add("Stranger: "+m);
+});
+
+function send(){
+const text = msg.value;
+socket.emit("message",text);
+add("You: "+text);
+msg.value="";
+}
+
+function add(t){
+const d=document.createElement("div");
+d.innerText=t;
+messages.appendChild(d);
+messages.scrollTop=messages.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
