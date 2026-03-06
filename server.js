@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
     }
 
 });
-  // 🔒 BAN CHECK
+
   if (reports[ip] && reports[ip].bannedUntil > Date.now()) {
     socket.emit("banned", {
       until: new Date(reports[ip].bannedUntil).toLocaleString()
@@ -55,11 +55,11 @@ io.on("connection", (socket) => {
     return;
   }
 
-  // 👥 ONLINE COUNT
+  
   onlineUsers++;
   io.emit("user-count", onlineUsers);
 
-  // 🔗 MATCH USERS
+  
   if (waitingUser) {
     socket.partner = waitingUser;
     waitingUser.partner = socket;
@@ -73,17 +73,17 @@ io.on("connection", (socket) => {
     socket.emit("waiting");
   }
 
-  // 💬 MESSAGE
+  // MESSAGE
   socket.on("message", (msg) => {
     if (socket.partner) socket.partner.emit("message", msg);
   });
 
-  // ✍️ TYPING
+  // TYPING
   socket.on("typing", () => {
     if (socket.partner) socket.partner.emit("typing");
   });
 
-  // 🚨 REPORT USER (✅ STEP 3 — ADDED HERE)
+  
   socket.on("report", () => {
     if (!reports[ip]) {
       reports[ip] = { count: 1, bannedUntil: null };
@@ -104,7 +104,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ⏭ NEXT STRANGER
+  //NEXT STRANGER
   socket.on("next", () => {
     if (socket.partner) {
       socket.partner.emit("partner-left");
@@ -118,7 +118,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ❌ DISCONNECT
+  //DISCONNECT
   socket.on("disconnect", () => {
     onlineUsers--;
     io.emit("user-count", onlineUsers);
